@@ -1,0 +1,89 @@
+﻿@model List<MarsRover.Models.RoverViewModel>
+
+@{
+    ViewBag.Title = "SetRovers";
+}
+
+<h2>SetRovers</h2>
+
+@if (TempData["Result"] != null)
+{
+    <script type="text/javascript">
+        var message = @Html.Raw(Json.Encode(TempData["Result"]));
+        alert(message);
+    </script>
+}
+
+<form method="post" id="form" action="SetRovers">
+    <div>
+        @foreach (var rover in Model)
+        {
+            var number = rover.Index + 1;
+            <div>
+                <label>Rover@(number)</label>
+                <input type="hidden" name="Model[@rover.Index].Index" value="@rover.Index" />
+            </div>
+            <div>
+                <label for="xCoordinate" class="col-md-2">X coordinate</label>
+                <input type="number" id="xCoordinate@(rover.Index)" name="Model[@rover.Index].X" value="@rover.X" required>
+            </div>
+            <div>
+                <label for="yCoordinate" class="col-md-2">Y coordinate</label>
+                <input type="number" id="yCoordinate@(rover.Index)" name="Model[@rover.Index].Y" value="@rover.Y" required>
+            </div>
+            <div>
+                <label for="orientation" class="col-md-2">Rover orientation</label>
+                <input type="text" id="orientation@(rover.Index)" name="Model[@rover.Index].Orientation" value="@rover.Orientation" maxlength="1" required>
+                <span style="color:deepskyblue">Input the following words: N(n), E(e), S(s), W(w)</span>
+            </div>
+            <div>
+                <label for="move" class="col-md-2">Rover move</label>
+                <input type="text" id="move@(rover.Index)" name="Model[@rover.Index].Move" value="@rover.Move" required>
+                <span style="color:deepskyblue">Composed of the following words: L(l),R(r), M(m)</span>
+            </div>
+            <hr />
+        }
+    </div>
+    <div>
+        <input type="button" value="AddNewRover" id="addNewRover" />
+    </div>
+    <div>
+        <input type="submit" value="Result" />
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        // Set new rover empty data.
+        $("#addNewRover").click(function () {
+            var url = "/Rover/AddTempRover";
+            var form = $("#form");
+            form.attr("action", url);
+            form.submit();
+        })
+    })
+
+    // Check the input for orientation is legal or not
+    $(document).on("change", "input[id^='orientation']", function (event) {
+        var input = event.target.value;
+        var regex = /^[NESWnesw]$/;
+        if (input != "") {
+            if (!input.match(regex)) {
+                alert("Must input the following words: N(n), E(e), S(s), W(w)");
+                return false;
+            }
+        }
+    });
+
+    // Check the input for move is legal or not.
+    $(document).on("change", "input[id^='move']", function () {
+        var input = event.target.value;
+        var regex = /^[LRMlrm]*$/;
+        if (input != "") {
+            if (!input.match(regex)) {
+                alert("Must be composed of the following words: L(l),R(r), M(m)");
+                return false;
+            }
+        }
+    });
+</script>
